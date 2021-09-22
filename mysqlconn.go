@@ -4,6 +4,8 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"go.uber.org/atomic"
 )
 
 type MysqlConn struct {
@@ -20,16 +22,19 @@ type MysqlConn struct {
 	sqlTx *sql.Tx
 
 	dbmodule *DBModule
+
+	asyncRunFlag atomic.Bool
 }
 
 func newMysqlConn(name string, dbmodule *DBModule) *MysqlConn {
 	conn := &MysqlConn{
-		name:     name,
-		cmdQueue: make(chan IMysqlCommand, DbWaitChanSize),
-		exitChan: make(chan struct{}),
-		sqlTx:    nil,
-		sqlDb:    nil,
-		dbmodule: dbmodule,
+		name:         name,
+		cmdQueue:     make(chan IMysqlCommand, DbWaitChanSize),
+		exitChan:     make(chan struct{}),
+		sqlTx:        nil,
+		sqlDb:        nil,
+		dbmodule:     dbmodule,
+		asyncRunFlag: *atomic.NewBool(false),
 	}
 
 	return conn
@@ -50,12 +55,15 @@ func (m *MysqlConn) connect(dsn string) error {
 
 	m.sqlDb.SetMaxOpenConns(1)
 	m.sqlDb.SetConnMaxLifetime(0)
-	m.run()
 
 	return nil
 }
 
 func (m *MysqlConn) AddCommand(command IMysqlCommand) {
+	if m.asyncRunFlag.CAS(false, true) == true {
+		m.run()
+	}
+
 	m.cmdQueue <- command
 }
 
