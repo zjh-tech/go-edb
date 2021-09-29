@@ -28,20 +28,20 @@ func Benchmark_Select(b *testing.B) {
 
 		recordSet, err := GDBModule.SyncQuerySqlOpt(selectSql, Hash64(userName))
 		if err != nil {
-			ELog.InfoAf("UserName=%v Select Error", userName)
+			ELog.Infof("UserName=%v Select Error", userName)
 			return
 		}
 
 		rc := recordSet.GetRecordSet()
 		if len(rc) > 1 || len(rc) == 0 {
-			ELog.InfoAf("UserName=%v Select RecordSet Len != 1", userName)
+			ELog.Infof("UserName=%v Select RecordSet Len != 1", userName)
 			return
 		}
 
 		accountid, _ := strconv.ParseUint(rc[0]["accountid"], 10, 64)
 		username := rc[0]["username"]
 		password := rc[0]["password"]
-		ELog.InfoAf("AccountID=%v UserName=%v Password=%v", accountid, username, password)
+		ELog.Infof("AccountID=%v UserName=%v Password=%v", accountid, username, password)
 	}
 }
 
@@ -64,7 +64,7 @@ func Test_AsyncSelect(t *testing.T) {
 			recordSet, err := GDBModule.SyncQuerySqlOpt(selectSql, Hash64(userName))
 			if err != nil {
 				message := fmt.Sprintf("UserName=%v Select Error", userName)
-				ELog.InfoAf(message)
+				ELog.Infof(message)
 				return nil, errors.New(message)
 			}
 
@@ -75,14 +75,14 @@ func Test_AsyncSelect(t *testing.T) {
 			userName := fmt.Sprintf("Test%v", index)
 			rc := recordSet.GetRecordSet()
 			if len(rc) > 1 || len(rc) == 0 {
-				ELog.InfoAf("UserName=%v Select RecordSet Len != 1", userName)
+				ELog.Infof("UserName=%v Select RecordSet Len != 1", userName)
 				return
 			}
 
 			accountid, _ := strconv.ParseUint(rc[0]["accountid"], 10, 64)
 			username := rc[0]["username"]
 			password := rc[0]["password"]
-			ELog.InfoAf("AccountID=%v UserName=%v Password=%v", accountid, username, password)
+			ELog.Infof("AccountID=%v UserName=%v Password=%v", accountid, username, password)
 		}, []interface{}{i}, uint64(i))
 	}
 }
@@ -110,7 +110,7 @@ func Test_InsertOrUpdate(t *testing.T) {
 		})
 		_, err := GDBModule.SyncNonQuerySqlOpt(sql, Hash64(userName))
 		if err != nil {
-			ELog.InfoAf("UserName=%v InsertOrUpdate Error", userName)
+			ELog.Infof("UserName=%v InsertOrUpdate Error", userName)
 			return
 		}
 	}
@@ -138,46 +138,24 @@ func (l *Log) Debug(v ...interface{}) {
 func (l *Log) Debugf(format string, v ...interface{}) {
 	//fmt.Printf(format, v...)
 }
-func (l *Log) DebugA(v ...interface{}) {
-	//fmt.Println(v...)
-}
-func (l *Log) DebugAf(format string, v ...interface{}) {
-	//fmt.Printf(format, v...)
-}
 func (l *Log) Info(v ...interface{}) {
 	//fmt.Println(v...)
 }
 func (l *Log) Infof(format string, v ...interface{}) {
 	//fmt.Printf(format, v...)
 }
-func (l *Log) InfoA(v ...interface{}) {
-	//fmt.Println(v...)
-}
-func (l *Log) InfoAf(format string, v ...interface{}) {
-	//fmt.Printf(format, v...)
-}
+
 func (l *Log) Warn(v ...interface{}) {
 	//fmt.Println(v...)
 }
 func (l *Log) Warnf(format string, v ...interface{}) {
 	//fmt.Printf(format, v...)
 }
-func (l *Log) WarnA(v ...interface{}) {
-	//fmt.Println(v...)
-}
-func (l *Log) WarnAf(format string, v ...interface{}) {
-	//fmt.Printf(format, v...)
-}
+
 func (l *Log) Error(v ...interface{}) {
 	//fmt.Println(v...)
 }
 func (l *Log) Errorf(format string, v ...interface{}) {
-	//fmt.Printf(format, v...)
-}
-func (l *Log) ErrorA(v ...interface{}) {
-	//fmt.Println(v...)
-}
-func (l *Log) ErrorAf(format string, v ...interface{}) {
 	//fmt.Printf(format, v...)
 }
 

@@ -49,7 +49,7 @@ func (d *DBModule) Init(connMaxCount uint64, dbTableMaxCount uint64, connSpecs [
 }
 
 func (d *DBModule) UnInit() {
-	ELog.InfoA("[DB] Stop")
+	ELog.Info("[DB] Stop")
 }
 
 func (d *DBModule) connect(dbIndex uint64, dbName string, host string, port uint32, user string, password string, charset string) error {
@@ -71,14 +71,14 @@ func (d *DBModule) connect(dbIndex uint64, dbName string, host string, port uint
 }
 
 func (d *DBModule) HashDBIndex(uid uint64) uint64 {
-	ELog.DebugAf("[DBModule] UID=%v Hash DBIndex=%v", uid, uid%d.connMaxCount)
+	ELog.Debugf("[DBModule] UID=%v Hash DBIndex=%v", uid, uid%d.connMaxCount)
 	return uid % d.connMaxCount
 }
 
 func (d *DBModule) HashTableIndex(uid uint64) uint64 {
 	dbIndex := d.HashDBIndex(uid)
 	dbTableIndex := uid % d.dbTableMaxCount
-	ELog.DebugAf("[DBModule] UID=%v Hash TableIndex=%v", uid, dbTableIndex*10+dbIndex)
+	ELog.Debugf("[DBModule] UID=%v Hash TableIndex=%v", uid, dbTableIndex*10+dbIndex)
 	return dbTableIndex*10 + dbIndex
 }
 
@@ -100,7 +100,7 @@ func (d *DBModule) syncSqlOpt(sql string, uid uint64, queryFlag bool) (IDBResult
 	conn, ok := d.conns[dbIndex]
 	if !ok {
 		message := fmt.Sprintf("Mysql SyncNonQuerySql GetMysqlConn Error Uid=%v", uid)
-		ELog.ErrorAf(message)
+		ELog.Errorf(message)
 		return nil, errors.New(message)
 	}
 
@@ -114,14 +114,14 @@ func (d *DBModule) syncSqlOpt(sql string, uid uint64, queryFlag bool) (IDBResult
 func (d *DBModule) AsyncDoSqlOpt(execSql ExecSqlFunc, execRec ExecSqlRecordFunc, attach []interface{}, uid uint64) {
 	command := NewDBAsyncCommand(execSql, execRec, attach)
 	if command == nil {
-		ELog.ErrorAf("Mysql SyncDoSqlOpt NewCommonCommand Error Uid=%v", uid)
+		ELog.Errorf("Mysql SyncDoSqlOpt NewCommonCommand Error Uid=%v", uid)
 		return
 	}
 
 	dbIndex := d.HashDBIndex(uid)
 	conn, ok := d.conns[dbIndex]
 	if !ok {
-		ELog.ErrorAf("[DBModule] Mysql UId=%v DBIndex=%v Group Is Not Exist", uid, dbIndex)
+		ELog.Errorf("[DBModule] Mysql UId=%v DBIndex=%v Group Is Not Exist", uid, dbIndex)
 		return
 	}
 
@@ -147,7 +147,7 @@ func (d *DBModule) Run(loopCount int) bool {
 			return false
 		}
 	}
-	ELog.ErrorA("[DBModule] Run Error")
+	ELog.Error("[DBModule] Run Error")
 	return false
 }
 

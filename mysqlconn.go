@@ -79,7 +79,7 @@ func (m *MysqlConn) run() {
 				cmd.OnExecuteSql(m)
 				m.dbmodule.AddExecutedCommand(cmd)
 			case <-m.exitChan:
-				ELog.InfoAf("Name %v MysqlConn Exit", m.name)
+				ELog.Infof("Name %v MysqlConn Exit", m.name)
 				return
 			}
 		}
@@ -93,48 +93,48 @@ func (m *MysqlConn) FindSqlDb() *sql.DB {
 func (m *MysqlConn) QuerySqlOpt(sql string) (IDBResult, error) {
 	rows, err := m.sqlDb.Query(sql)
 	if err != nil {
-		ELog.ErrorAf("[Mysql] QuerySqlOpt Sql=%v, Error=%v", sql, err)
+		ELog.Errorf("[Mysql] QuerySqlOpt Sql=%v, Error=%v", sql, err)
 		return nil, err
 	}
 
-	ELog.InfoAf("[Mysql] QuerySqlOpt Sql=%v Success", sql)
+	ELog.Infof("[Mysql] QuerySqlOpt Sql=%v Success", sql)
 	return NewMysqlRecordSet(rows, DbDefaultAffectedRows, DbDefaultInsertId), nil
 }
 
 func (m *MysqlConn) NonQuerySqlOpt(sql string) (IDBResult, error) {
 	res, err := m.sqlDb.Exec(sql)
 	if err != nil {
-		ELog.InfoAf("[Mysql] NonQuerySqlOpt Sql=%v, Error=%v", sql, err)
+		ELog.Infof("[Mysql] NonQuerySqlOpt Sql=%v, Error=%v", sql, err)
 		return nil, err
 	}
 
 	affectedRows, err1 := res.RowsAffected()
 	if err1 != nil {
-		ELog.InfoAf("[Mysql] NonQuerySqlOpt Sql=%v,RowsAffected Error=%v", sql, err1)
+		ELog.Infof("[Mysql] NonQuerySqlOpt Sql=%v,RowsAffected Error=%v", sql, err1)
 		return nil, err1
 	}
 
 	insertId, err2 := res.LastInsertId()
 	if err2 != nil {
-		ELog.InfoAf("[Mysql] NonQuerySqlOpt Sql=%v,LastInsertId Error=%v", sql, err2)
+		ELog.Infof("[Mysql] NonQuerySqlOpt Sql=%v,LastInsertId Error=%v", sql, err2)
 		return nil, err2
 	}
 
-	ELog.InfoAf("[Mysql] NonQuerySqlOpt Sql=%v Success", sql)
+	ELog.Infof("[Mysql] NonQuerySqlOpt Sql=%v Success", sql)
 
 	return NewMysqlRecordSet(nil, affectedRows, insertId), nil
 }
 
 func (m *MysqlConn) BeginTransact() {
 	if m.sqlTx != nil {
-		ELog.ErrorAf("[MysqlConn] Begin SqlTx Not Nil")
+		ELog.Errorf("[MysqlConn] Begin SqlTx Not Nil")
 		m.sqlTx = nil
 	}
 
 	var err error
 	m.sqlTx, err = m.sqlDb.Begin()
 	if err != nil {
-		ELog.InfoAf("[MysqlConn] Begin Error=%v", err)
+		ELog.Infof("[MysqlConn] Begin Error=%v", err)
 	}
 }
 
@@ -146,7 +146,7 @@ func (m *MysqlConn) CommitTransact() {
 	err := m.sqlTx.Commit()
 	m.sqlTx = nil
 	if err != nil {
-		ELog.InfoAf("[MysqlConn] Commit Error=%v", err)
+		ELog.Infof("[MysqlConn] Commit Error=%v", err)
 	}
 }
 
@@ -158,6 +158,6 @@ func (m *MysqlConn) RollbackTransact() {
 	err := m.sqlTx.Rollback()
 	m.sqlTx = nil
 	if err != nil {
-		ELog.InfoAf("[MysqlConn] Rollback Error=%v", err)
+		ELog.Infof("[MysqlConn] Rollback Error=%v", err)
 	}
 }
