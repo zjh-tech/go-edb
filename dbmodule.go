@@ -15,6 +15,13 @@ type DBModule struct {
 	conns           map[uint64]IMysqlConn
 }
 
+func NewDBModule() *DBModule {
+	return &DBModule{
+		conns:         make(map[uint64]IMysqlConn),
+		executedQueue: make(chan IMysqlCommand, DbExecutedChanSize),
+	}
+}
+
 func (d *DBModule) Init(connMaxCount uint64, dbTableMaxCount uint64, connSpecs []*DBConnSpec) error {
 	d.connMaxCount = connMaxCount
 	d.dbTableMaxCount = dbTableMaxCount
@@ -152,10 +159,3 @@ func (d *DBModule) Run(loopCount int) bool {
 }
 
 var GDBModule *DBModule
-
-func init() {
-	GDBModule = &DBModule{
-		conns:         make(map[uint64]IMysqlConn),
-		executedQueue: make(chan IMysqlCommand, DbExecutedChanSize),
-	}
-}
