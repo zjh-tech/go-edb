@@ -91,8 +91,11 @@ func asSqlString(src interface{}) string {
 		addSingleQuotesString(&buf, escape_string_sql)
 		return buf.String()
 	case []byte:
+		if v == nil {
+			return "''"
+		}
 		var buf bytes.Buffer
-		buf.Write(v)
+		addSingleQuotesString(&buf, string(v))
 		return buf.String()
 	}
 
